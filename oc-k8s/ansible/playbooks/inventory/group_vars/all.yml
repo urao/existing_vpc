@@ -1,0 +1,30 @@
+###################################################
+# Ansible specific vars
+##
+
+# ansible connection details
+ansible_user: root
+ansible_connection: ssh
+ansible_ssh_pass: contrail123
+host_key_checking: false
+
+###################################################
+# Common settings for contrail
+##
+
+# contrail package
+# example 
+contrail_package: contrail-kubernetes-docker-images_4.0.0.0-20.tgz
+contrail_ansible_package : contrail-ansible-4.0.0.0-20.tar.gz 
+contrail_version: 4.0.0.0-20
+
+#contrail_package:
+#contrail_ansible_package: 
+#contrail_version: 
+
+master_hostname: k8s-m00
+node_hostname: k8s-n00
+
+master_ip: 10.59.0.234
+node_ip: 10.59.0.165
+

@@ -1,0 +1,6 @@
+[master]
+52.27.205.102     ansible_connection=ssh      ansible_ssh_pass=contrail123
+
+[nodes]
+35.161.250.79     ansible_connection=ssh      ansible_ssh_pass=contrail123
+

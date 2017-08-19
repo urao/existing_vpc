@@ -1,0 +1,42 @@
+[
+    {
+        "ParameterKey": "AvailZone",
+        "ParameterValue": "us-west-2a"
+    },
+    {
+        "ParameterKey": "CCAMI",
+        "ParameterValue": "ami-b2148dd2"
+    },
+    {
+        "ParameterKey": "CCInstanceType",
+        "ParameterValue": "t2.2xlarge"
+    },
+    {
+        "ParameterKey": "CCName1",
+        "ParameterValue": "cc2"
+    },
+    {
+        "ParameterKey": "CCName2",
+        "ParameterValue": "compute2"
+    },
+    {
+        "ParameterKey": "InstanceCount",
+        "ParameterValue": "2"
+    },
+    {
+        "ParameterKey": "CCVPC",
+        "ParameterValue": "vpc-cec361a8"
+    },
+    {
+        "ParameterKey": "CCSubnet",
+        "ParameterValue": "subnet-6aa1b623"
+    },
+    {
+        "ParameterKey": "CCSecGrp",
+        "ParameterValue": "sg-05d5b67f"
+    },
+    {
+        "ParameterKey": "SSHKey",
+        "ParameterValue": "ocontrail"
+    }
+]

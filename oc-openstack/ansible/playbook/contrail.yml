@@ -1,0 +1,75 @@
+---
+- name: Common system settings on all the hosts
+  hosts: all
+  remote_user: root
+  #nothing to do in common in both the nodes as of now hence skipping
+
+- name: Setup compute node 
+  hosts: compute
+  remote_user: root
+  become: true
+  tasks:
+    - name: Set compute hostname
+      command: "{{item}}"
+      with_items:
+       - hostname {{ computename }}
+       - sed -i 's/baseubuntu/{{ computename }}/' /etc/hosts
+       - sed -i 's/baseubuntu/{{ computename }}/' /etc/hostname
+    - name: Populate hosts file
+      shell: printf '127.0.0.1  {{ computename }}\n' >> /etc/hosts
+
+- name: Setup contrail controller node and deploy contrail packages
+  hosts: controller
+  remote_user: root
+  become: true
+  tasks:
+    - name: Set cc node hostname
+      command: "{{item}}"
+      with_items:
+       - hostname {{ controllername }}
+       - sed -i 's/baseubuntu/{{ controllername }}/' /etc/hosts
+       - sed -i 's/baseubuntu/{{ controllername }}/' /etc/hostname
+    - name: Populate hosts file
+      shell: printf '127.0.0.1  {{ controllername }}\n' >> /etc/hosts
+    - name: Copy contrail packages onto contrail controller node
+      copy: src=../files/{{ contrail_package }} dest=/root/{{ contrail_package }}
+    - name: Unpack contrail debian package
+      command: "dpkg -i {{ contrail_package }}"
+    - name: Setup contrail package
+      command: "/opt/contrail/contrail_packages/setup.sh"
+    - name: Copy jinja template to testbed.y
+      template: src=../files/testbed_single.j2 dest=/opt/contrail/utils/fabfile/testbeds/testbed.py
+    - name: Run fab install packages
+      command: fab install_pkg_all:/root/{{ contrail_package }}
+      args:
+        chdir: /opt/contrail/utils
+    - name: Run fab install contrail packages
+      command: fab install_contrail:reboot='False'
+      args:
+        chdir: /opt/contrail/utils
+    - name: Run fab setup_all contrail packages
+      command: fab setup_all:reboot='False'
+      args:
+        chdir: /opt/contrail/utils
+
+- name: Reboot compute node 
+  hosts: compute
+  remote_user: root
+  become: true
+  tasks:
+    - name: Copy nova-compute.conf file to dest folder
+      copy: src=../files/nova-compute.conf dest=/etc/nova/nova-compute.conf
+    - name: Restart nova-compute service
+      service:
+       name: nova-compute
+       state: restarted
+  post_tasks:
+    - name: Reboot node
+      shell: sleep 15 && shutdown -r now "rebooting compute node"
+      async: 20
+      poll: 0
+      become: yes
+      become_method: sudo
+      ignore_errors: true
+    - name: Waiting for compute node to come back
+      local_action: wait_for port=22 host={{ ansible_ssh_host }} state=started delay=30 timeout=240
