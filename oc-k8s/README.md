@@ -9,6 +9,7 @@ Pre-requisties:
 2. On host from where these scripts will be executed, install the below packages
    1. apt-get -y install python-pip ansible git awscli
 3. Configure, aws with credentials, access_key and secret_access_key
+4. VPC and Subnet is created, in which Opencontrail+k8s will be deployed
 
 
 Steps to deploy contrail cloud:
@@ -18,12 +19,12 @@ Steps to deploy contrail cloud:
 3. Copy the opencontrail package under ansible/files folder
    1. Example, contrail-install-packages_3.2.2.0-33mitaka_all.deb
 4. Run ./create_keypair.sh [Create KeyPair]
-5. Populate contrail-parameters.json file with required values, refer to sample file
-6. Create VPC, Subnet and 2 EC2 instances with host OS Ubuntu 14.04.4
+5. Modify cstack-parameters.json file located at (cloudformation/contrail/) with name of the EC2 instances (CCName1, CCName2), VPC id, Subnet id and Security Group id
+6. Create 2 EC2 instances with host OS Ubuntu 16.04.4 in VPC, Subnet provided
    1. Run ./create_ocontrail_stack.sh <stack-name> ocontrail cstack-parameters
 7. Verify cloudformation stack and populate cluster information to run deploy contrail
    1. Run ./verify_ocontrail_stack.sh <stack-name>
-8. Modify contrail package name in ansible/playbook/inventory/group_vars/all.yml
+8. Modify contrail_docker and contrail_ansible package name in ansible/playbook/inventory/group_vars/all.yml
 9. Run ansible playbook to deploy Opencontrail Cloud
    1. Change directory 'cd ansible/playbook'
    2. Run 'ansible-playbook -i inventory/ contrail.yml' 
