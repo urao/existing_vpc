@@ -1,0 +1,109 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Deploys Home-2-VPN connection",
+    "Parameters": {
+        "AvailZone": {
+            "Description": "Choose the Availability Zone to create the VPN connection",
+            "Type": "AWS::EC2::AvailabilityZone::Name"
+        },
+        "VpcId": {
+            "Description": "Provide VPC Id to attach to this VPN GW",
+            "Type": "AWS::EC2::VPC::Id"
+        },
+        "myRouterTableId": {
+            "Description": "Provide VPC RouterTable Id to propagate the static routes to the main RT of VPC",
+            "Type": "AWS::EC2::RouteTable::Id"
+        },
+        "homeCIDRBlock": {
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "Description": "Provide Home internal network address to connect from to AWS",
+            "Type": "String"
+        },
+        "HomePublicIpAddress": {
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "Description": "Provide Home Public Ip Address to connect to AWS VPN GW",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "myVpcCustomerGateway": {
+            "Type": "AWS::EC2::CustomerGateway",
+            "Properties": {
+                "BgpAsn": 6500,
+                "IpAddress": {
+			"Ref": "HomePublicIpAddress"
+		},
+		"Tags": [
+			{
+		         "Key": "Name",
+                         "Value": "Home-2-AWS-VPN"
+			}
+		],
+	    "Type": "ipsec.1"
+            }
+        },
+        "myVpcVpnGateway": {
+            "Type": "AWS::EC2::VPNGateway",
+            "Properties": {
+                "Type": "ipsec.1",
+		"Tags": [
+			{
+		         "Key": "Name",
+                         "Value": "Home-2-AWS-VPN"
+			}
+		]
+            }
+        },
+        "myVpcVpnGatewayAttachment": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "VpcId": {
+			"Ref": "VpcId"
+		},
+                "VpcGatewayId": { "Ref": "myVpcVpnGateway" }
+            }
+        },
+        "myVpcVpnConnectionPrimary": {
+            "Type": "AWS::EC2::VPNConnection",
+            "Properties": {
+                "Type": "ipsec.1",
+                "CustomerGatewayId": {
+			"Ref": "myVpcCustomerGateway"
+		},
+		"StaticRoutesOnly": true,
+		"Tags": [
+			{
+		         "Key": "Name",
+                         "Value": "Home-2-AWS-VPN"
+			}
+		],
+                "VpnGatewayId": {
+			"Ref": "myVpcVpnGateway"
+		}
+            }
+        },
+        "myVpcVpnGatewayRouteProp": {
+            "Type": "AWS::EC2::VPNGatewayRoutePropagation",
+            "Properties": {
+                "RouteTableIds": {
+			"Ref": "myRouterTableId"
+		},
+                "VpnGatewayId": {
+			"Ref": "myVpcVpnGateway"
+		},
+		"DependsOn": "myVpcVpnGatewayAttachment"
+            }
+        },
+        "myVpcConnectionRoutePrimary": {
+            "Type": "AWS::EC2::VPNConnectionRoute",
+            "Properties": {
+                "DestinationCidrBlock": {
+			"Ref": "homeCIDRBlock"
+		},
+                "VpnConnectionId": {
+			"Ref": "myVpcVpnConnectionPrimary"
+		}
+            }
+        }
+    }
+}

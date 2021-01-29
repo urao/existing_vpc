@@ -1,0 +1,22 @@
+[
+    {
+        "ParameterKey": "AvailZone",
+        "ParameterValue": "us-west-1c"
+    },
+    {
+        "ParameterKey": "VpcId",
+        "ParameterValue": "*******"
+    },
+    {
+        "ParameterKey": "myRouterTableId",
+        "ParameterValue": "*******"
+    },
+    {
+        "ParameterKey": "homeCIDRBlock",
+        "ParameterValue": "192.168.0.0/24"
+    },
+    {
+        "ParameterKey": "HomePublicIpAddress",
+        "ParameterValue": "*******"
+    }
+]
