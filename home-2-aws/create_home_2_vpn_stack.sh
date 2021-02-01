@@ -34,4 +34,5 @@ aws cloudformation create-stack \
     --parameters file://cloudformation/vpn/$parametersfile
 
 echo -e "Wait till the stack($stackname) is created\n"
-aws cloudformation wait stack-create-complete --stack-name $stackname && aws cloudformation describe-stacks --stack-name $stackname
+aws cloudformation wait stack-create-complete \
+	--stack-name $stackname && aws cloudformation describe-stacks --stack-name $stackname
